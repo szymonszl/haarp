@@ -7,10 +7,10 @@ from flask import (
     redirect,
     send_file,
 )
-from io import BytesIO
 import configparser
 import os
 import glob
+import subprocess
 app = Flask(__name__)
 
 config = configparser.ConfigParser()
@@ -18,6 +18,7 @@ config.read('config.ini')
 
 HOMEDIR = config['source']['path']
 supported = ['mp3', 'flac', 'm4a', 'webm', 'wav', 'wma']
+FFMPEGARGS = config['ffmpeg']['args'].split()
 
 def getlisting(path):
     files = []
@@ -33,7 +34,24 @@ def getlisting(path):
     return render_template('index.html', path=path, files=files)
 
 def makemp3(path):
-    return Response(f'you expected a mp3 file? jokes on you, its real name is {path} now to actually make it mp3...')
+    ffmpeg = subprocess.Popen(
+        [
+            'ffmpeg',
+            '-i',
+            path,
+            '-c:a',
+            'libmp3lame',
+            '-f',
+            'mp3',
+            '-vn',
+            *FFMPEGARGS,
+            '-'
+        ],
+        stdout=subprocess.PIPE
+    )
+
+    return send_file(ffmpeg.stdout, mimetype='audio/mpeg')
+    #return Response(iter(ffmpeg.stdout.read, b''), mimetype='audio/mpeg')
 
 @app.route('/')
 @app.route('/<path:path>')
