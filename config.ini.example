@@ -1,0 +1,4 @@
+[source]
+
+# path from which to serve files
+path = /home/username/Music
