@@ -2,3 +2,9 @@
 
 # path from which to serve files
 path = /home/username/Music
+
+
+[ffmpeg]
+# additional arguments to pass to ffmpeg
+# stuff like the output format and codec are added by the program
+args = -q:a 5
