@@ -1,4 +1,4 @@
-# HAARP
+# HAARP - HTTP Anti Audiophile Reencoding Proxy
 
 This little program starts a webserver which hosts audio files from a defined directory. The audio files are detected by the filename suffix. The audio files are converted to mp3 while downloading. it also tries to read mpdignore files and fails miserably, but my requirements are low enough
 
