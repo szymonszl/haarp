@@ -1,8 +1,8 @@
 [source]
-
 # path from which to serve files
 path = /home/username/Music
-
+# use not working mpdignore support
+use mpdignore = no
 
 [ffmpeg]
 # additional arguments to pass to ffmpeg

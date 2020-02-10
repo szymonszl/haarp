@@ -11,6 +11,7 @@ import configparser
 import os
 import glob
 import subprocess
+import fnmatch
 app = Flask(__name__)
 
 config = configparser.ConfigParser()
@@ -19,11 +20,29 @@ config.read('config.ini')
 HOMEDIR = config['source']['path']
 supported = ['mp3', 'flac', 'm4a', 'webm', 'wav', 'wma']
 FFMPEGARGS = config['ffmpeg']['args'].split()
+MPDIGNORE = config['source'].getboolean('use mpdignore', fallback=False)
+
+def mpdcheck(f, ignore):
+    for pattern in ignore:
+        if fnmatch.fnmatch(f, pattern):
+            #print(f'{f} FAILED THE VIBE CHECK {pattern!r}') # debugging
+            return False
+    return True
 
 def getlisting(path):
     files = []
+    ignore = []
+    if MPDIGNORE:
+        try:
+            with open(os.path.join(path, '.mpdignore')) as fd:
+                ignore = [x.strip() for x in  fd.readlines()]
+        except FileNotFoundError:
+            pass
     for f in os.listdir(path):
         if f[0] != '.':
+            if MPDIGNORE:
+                if not mpdcheck(f, ignore):
+                    continue
             if os.path.isdir(os.path.join(path, f)):
                 files.append(f)
             s = f.split('.')
